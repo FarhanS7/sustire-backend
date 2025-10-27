@@ -16,9 +16,22 @@ const app = express();
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(cookieParser());
+const allowedOrigins = [
+  process.env.FRONTEND_ORIGIN, // e.g. https://sus-tire.vercel.app
+  "http://localhost:3000", // local dev frontend
+];
+
 app.use(
   cors({
-    origin: process.env.FRONTEND_ORIGIN,
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
