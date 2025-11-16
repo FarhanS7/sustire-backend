@@ -4,6 +4,7 @@ const prisma = new PrismaClient();
 const bcrypt = require("bcryptjs");
 
 async function main() {
+  // --- Admin User ---
   const email = process.env.ADMIN_EMAIL;
   const password = process.env.ADMIN_PASSWORD;
   const name = process.env.ADMIN_NAME || "Admin";
@@ -22,7 +23,7 @@ async function main() {
   });
   console.log("Admin user ready:", admin.email);
 
-  // Sample products
+  // --- Sample Products ---
   const products = [
     {
       name: "AirFlex Runner",
@@ -31,7 +32,6 @@ async function main() {
       priceCents: 6999,
       imageUrl: "https://picsum.photos/seed/airflex/800/600",
       sizes: ["6", "7", "8", "9", "10", "11"],
-      qtyInStock: 50,
     },
     {
       name: "StreetPro Classic",
@@ -40,7 +40,6 @@ async function main() {
       priceCents: 5499,
       imageUrl: "https://picsum.photos/seed/streetpro/800/600",
       sizes: ["6", "7", "8", "9", "10"],
-      qtyInStock: 40,
     },
   ];
 
@@ -48,10 +47,23 @@ async function main() {
     await prisma.product.upsert({
       where: { slug: p.slug },
       update: {},
-      create: p,
+      create: {
+        name: p.name,
+        slug: p.slug,
+        description: p.description,
+        priceCents: p.priceCents,
+        imageUrl: p.imageUrl,
+        sizes: {
+          create: p.sizes.map((size) => ({
+            size,
+            qtyInStock: 50, // default stock
+          })),
+        },
+      },
     });
   }
-  console.log("Seeded sample products");
+
+  console.log("Seeded sample products with sizes");
 }
 
 main()
