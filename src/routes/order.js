@@ -20,7 +20,6 @@ const checkoutSchema = z.object({
     z.object({
       productId: z.number(),
       quantity: z.number().min(1),
-      size: z.string().optional(),
       size: z.string().nullable().optional(),
     })
   ),
